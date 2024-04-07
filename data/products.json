@@ -1,9 +1,1 @@
-[
-  {
-    "id": "12345",
-    "title": "book1",
-    "imageUrl": "https://media.gettyimages.com/id/157482029/photo/stack-of-books.jpg?s=612x612&w=gi&k=20&c=_Yaofm8sZLZkKs1eMkv-zhk8K4k5u0g0fJuQrReWfdQ=",
-    "description": "This is a test book",
-    "price": "19"
-  }
-]
+[{"id":"12345","title":"book1","imageUrl":"https://media.gettyimages.com/id/157482029/photo/stack-of-books.jpg?s=612x612&w=gi&k=20&c=_Yaofm8sZLZkKs1eMkv-zhk8K4k5u0g0fJuQrReWfdQ=","description":"This is a test book","price":"25"},{"id":"0.5670766290761757","title":"book2","imageUrl":"https://media.gettyimages.com/id/157482029/photo/stack-of-books.jpg?s=612x612&w=gi&k=20&c=_Yaofm8sZLZkKs1eMkv-zhk8K4k5u0g0fJuQrReWfdQ=","description":"This is a test book info 2","price":"444.6"}]

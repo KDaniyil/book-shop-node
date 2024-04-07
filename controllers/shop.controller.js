@@ -1,4 +1,6 @@
-const Product = require("../models/product");
+const Product = require("../models/product.model");
+
+const Cart = require("../models/cart.model");
 
 /**
  * Retrieves and renders the products on the 'shop' page.
@@ -36,8 +38,10 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
   const { productId } = req.body;
-  console.log(productId);
-  res.redirect("/cart");
+  Product.getProductById(productId, (product) => {
+    Cart.addProduct(productId, product.price);
+    res.redirect("/cart");
+  });
 };
 
 exports.getOrders = (req, res, next) => {

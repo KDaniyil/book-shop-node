@@ -4,7 +4,7 @@ const path = require("path");
 
 const router = express.Router();
 
-const shopController = require("../controllers/shop");
+const shopController = require("../controllers/shop.controller");
 
 router.get("/", shopController.getIndex);
 
