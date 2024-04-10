@@ -25,30 +25,39 @@ exports.getAddProduct = (req, res, next) => {
  * @param {Object} res Response object
  * @param {Function} next Next middleware function
  */
-exports.postAddProduct = (req, res, next) => {
+exports.postAddProduct = async (req, res, next) => {
   const { title, imageUrl, description, price } = req.body;
   const product = new Product(null, title, imageUrl, description, price);
-  product.save();
-  res.redirect("/");
+  try {
+    await product.save();
+    res.redirect("/");
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-exports.getProducts = (req, res, next) => {
-  Product.fetchAll((products) => {
+exports.getProducts = async (req, res, next) => {
+  try {
+    const [rows, fieldData] = await Product.fetchAll();
     res.render("admin/products", {
-      prods: products,
+      prods: rows,
       pageTitle: "Admin Products",
       path: "/admin/products",
     });
-  });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-exports.getEditProduct = (req, res, next) => {
+exports.getEditProduct = async (req, res, next) => {
   const editMode = req.query.edit;
   if (!editMode) {
     return res.redirect("/");
   }
   const { productId } = req.params;
-  Product.getProductById(productId, (product) => {
+  try {
+    const [rows, fieldData] = await Product.getProductById(productId);
+    const product = rows[0];
     if (!product) {
       return res.redirect("/");
     }
@@ -58,18 +67,28 @@ exports.getEditProduct = (req, res, next) => {
       editing: editMode,
       product: product,
     });
-  });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-exports.postEditProduct = (req, res, next) => {
+exports.postEditProduct = async (req, res, next) => {
   const { id, title, imageUrl, description, price } = req.body;
   const product = new Product(id, title, imageUrl, description, price);
-  product.save();
-  res.redirect("/admin/products");
+  try {
+    await product.save();
+    res.redirect("/admin/products");
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-exports.postDeleteProduct = (req, res, next) => {
+exports.postDeleteProduct = async (req, res, next) => {
   const { productId } = req.body;
-  Product.deleteById(productId);
-  res.redirect("/admin/products");
+  try {
+    await Product.deleteById(productId);
+    res.redirect("/admin/products");
+  } catch (error) {
+    console.log(error);
+  }
 };
