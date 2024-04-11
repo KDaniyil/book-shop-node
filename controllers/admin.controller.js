@@ -27,13 +27,18 @@ exports.getAddProduct = (req, res, next) => {
  */
 exports.postAddProduct = async (req, res, next) => {
   const { title, imageUrl, description, price } = req.body;
-  const product = new Product(null, title, imageUrl, description, price);
-  try {
-    await product.save();
-    res.redirect("/");
-  } catch (error) {
-    console.log(error);
-  }
+  Product.create({
+    title: title,
+    price: price,
+    description: description,
+    imageUrl: imageUrl,
+  })
+    .then((result) => {
+      console.log(result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 exports.getProducts = async (req, res, next) => {
