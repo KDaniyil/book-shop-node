@@ -10,23 +10,24 @@ const Cart = require("../models/cart.model");
  * @param {Function} next - The next middleware function
  * @return {void}
  */
-exports.getProducts = async (req, res, next) => {
-  try {
-    const [rows, fieldData] = await Product.fetchAll();
-    res.render("shop/product-list", {
-      prods: rows,
-      pageTitle: "All Products",
-      path: "/products",
+exports.getProducts = (req, res, next) => {
+  Product.findAll()
+    .then((products) => {
+      res.render("shop/product-list", {
+        prods: products,
+        pageTitle: "All Products",
+        path: "/products",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  } catch (error) {
-    console.log(error);
-  }
 };
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll()
-    .then(([rows, fieldData]) => {
+  Product.findAll()
+    .then((products) => {
       res.render("shop/index", {
-        prods: rows,
+        prods: products,
         pageTitle: "Shop",
         path: "/",
       });
@@ -89,10 +90,10 @@ exports.getCheckout = (req, res, next) => {
 exports.getProduct = async (req, res, next) => {
   const { productId } = req.params;
   try {
-    const [product] = await Product.getProductById(productId);
+    const product = await Product.findByPk(productId);
     res.render("shop/product-detail", {
-      product: product[0],
-      pageTitle: product[0]?.title,
+      product: product,
+      pageTitle: product?.title,
       path: "/products",
     });
   } catch (error) {
