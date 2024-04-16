@@ -1,7 +1,5 @@
 const Product = require("../models/product.model");
 
-const Cart = require("../models/cart.model");
-
 /**
  * Retrieves and renders the products on the 'shop' page.
  *
@@ -107,11 +105,44 @@ exports.postCartDeleteProduct = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
+exports.postOrder = (req, res, next) => {
+  let fetchedCart;
+  req.user
+    .getCart()
+    .then((cart) => {
+      fetchedCart = cart;
+      return cart.getProducts();
+    })
+    .then((products) => {
+      return req.user.createOrder().then((order) => {
+        return order.addProducts(
+          products.map((p) => {
+            p.orderItem = { quantity: p.cartItem.quantity };
+            return p;
+          })
+        );
+      });
+    })
+    .then((resp) => {
+      fetchedCart.setProducts(null);
+    })
+    .then(() => {
+      res.redirect("shop/orders");
+    })
+    .catch((err) => console.log(err));
+};
+
 exports.getOrders = (req, res, next) => {
-  res.render("shop/orders", {
-    pageTitle: "Orders",
-    path: "/orders",
-  });
+  req.user
+    .getOrders({ include: ["products"] })
+    .then((orders) => {
+      res.render("shop/orders", {
+        orders: orders,
+        pageTitle: "Your Orders",
+        path: "/orders",
+      });
+    })
+    .catch((err) => console.log(err));
 };
 
 exports.getCheckout = (req, res, next) => {
