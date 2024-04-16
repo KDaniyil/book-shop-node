@@ -7,6 +7,8 @@ const errorController = require("./controllers/error.controller");
 const sequelize = require("./util/database");
 const Product = require("./models/product.model");
 const User = require("./models/user.model");
+const Cart = require("./models/cart.model");
+const CartItem = require("./models/cart-item.model");
 
 const app = express();
 
@@ -20,7 +22,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  console.log("middleware");
   User.findByPk(1)
     .then((user) => {
       req.user = user;
@@ -36,6 +37,10 @@ app.use(errorController.get404);
 
 Product.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
 User.hasMany(Product);
+User.hasOne(Cart);
+Cart.belongsTo(User);
+Cart.belongsToMany(Product, { through: CartItem });
+Product.belongsToMany(Cart, { through: CartItem });
 
 sequelize
   .sync()
@@ -50,7 +55,9 @@ sequelize
     return user;
   })
   .then((user) => {
-    //console.log(user, "user");
+    user.createCart();
+  })
+  .then((cart) => {
     app.listen(3000);
   })
   .catch((err) => {
