@@ -27,86 +27,95 @@ exports.getAddProduct = (req, res, next) => {
  */
 exports.postAddProduct = (req, res, next) => {
   const { title, imageUrl, description, price } = req.body;
-  req.user
-    .createProduct({
-      title: title,
-      price: price,
-      description: description,
-      imageUrl: imageUrl,
-    })
-    .then((result) => {
+  const product = new Product(title, price, description, imageUrl);
+  product
+    .save()
+    .then(() => {
       res.redirect("/admin/products");
     })
     .catch((err) => {
       console.log(err);
     });
+  // req.user
+  //   .createProduct({
+  //     title: title,
+  //     price: price,
+  //     description: description,
+  //     imageUrl: imageUrl,
+  //   })
+  //   .then((result) => {
+  //     res.redirect("/admin/products");
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   });
 };
 
-exports.getProducts = (req, res, next) => {
-  req.user
-    .getProducts()
-    .then((products) => {
-      res.render("admin/products", {
-        prods: products,
-        pageTitle: "Admin Products",
-        path: "/admin/products",
-      });
-    })
-    .catch((err) => console.log(err));
-};
+// exports.getProducts = (req, res, next) => {
+//   req.user
+//     .getProducts()
+//     .then((products) => {
+//       res.render("admin/products", {
+//         prods: products,
+//         pageTitle: "Admin Products",
+//         path: "/admin/products",
+//       });
+//     })
+//     .catch((err) => console.log(err));
+// };
 
-exports.getEditProduct = async (req, res, next) => {
-  const editMode = req.query.edit;
-  if (!editMode) {
-    return res.redirect("/");
-  }
-  const { productId } = req.params;
-  try {
-    const products = await req.user.getProducts({ where: { id: productId } });
-    const product = products[0];
-    if (!product) {
-      return res.redirect("/");
-    }
-    res.render("admin/edit-product", {
-      pageTitle: "Edit Product",
-      path: "/admin/edit-product",
-      editing: editMode,
-      product: product,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
+// exports.getEditProduct = async (req, res, next) => {
+//   const editMode = req.query.edit;
+//   if (!editMode) {
+//     return res.redirect("/");
+//   }
+//   const { productId } = req.params;
+//   try {
+//     const products = await req.user.getProducts({ where: { id: productId } });
+//     const product = products[0];
+//     if (!product) {
+//       return res.redirect("/");
+//     }
+//     res.render("admin/edit-product", {
+//       pageTitle: "Edit Product",
+//       path: "/admin/edit-product",
+//       editing: editMode,
+//       product: product,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
-exports.postEditProduct = async (req, res, next) => {
-  const { id, title, imageUrl, description, price } = req.body;
+// exports.postEditProduct = async (req, res, next) => {
+//   const { id, title, imageUrl, description, price } = req.body;
 
-  try {
-    await Product.update(
-      {
-        title: title,
-        imageUrl: imageUrl,
-        description: description,
-        price: price,
-      },
-      { where: { id: id } }
-    );
-    res.redirect("/admin/products");
-  } catch (error) {
-    console.log(error);
-  }
-};
+//   try {
+//     await Product.update(
+//       {
+//         title: title,
+//         imageUrl: imageUrl,
+//         description: description,
+//         price: price,
+//       },
+//       { where: { id: id } }
+//     );
+//     res.redirect("/admin/products");
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
-exports.postDeleteProduct = async (req, res, next) => {
-  const { productId } = req.body;
-  try {
-    await Product.destroy({
-      where: {
-        id: productId,
-      },
-    });
-    res.redirect("/admin/products");
-  } catch (error) {
-    console.log(error);
-  }
-};
+// exports.postDeleteProduct = async (req, res, next) => {
+//   const { productId } = req.body;
+//   try {
+//     await Product.destroy({
+//       where: {
+//         id: productId,
+//       },
+//     });
+//     res.redirect("/admin/products");
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
