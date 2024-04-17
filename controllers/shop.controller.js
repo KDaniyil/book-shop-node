@@ -9,7 +9,7 @@ const Product = require("../models/product.model");
  * @return {void}
  */
 exports.getProducts = (req, res, next) => {
-  Product.findAll()
+  Product.fetchAll()
     .then((products) => {
       res.render("shop/product-list", {
         prods: products,
@@ -22,7 +22,7 @@ exports.getProducts = (req, res, next) => {
     });
 };
 exports.getIndex = (req, res, next) => {
-  Product.findAll()
+  Product.fetchAll()
     .then((products) => {
       res.render("shop/index", {
         prods: products,
@@ -155,7 +155,7 @@ exports.getCheckout = (req, res, next) => {
 exports.getProduct = async (req, res, next) => {
   const { productId } = req.params;
   try {
-    const product = await Product.findByPk(productId);
+    const product = await Product.findById(productId);
     res.render("shop/product-detail", {
       product: product,
       pageTitle: product?.title,

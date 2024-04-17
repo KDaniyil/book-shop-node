@@ -16,7 +16,7 @@ const mongoConnect = require("./util/database").mongoConnection;
 const app = express();
 
 const adminRoutes = require("./routes/admin.routes");
-// const shopRoutes = require("./routes/shop.routes");
+const shopRoutes = require("./routes/shop.routes");
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -35,7 +35,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/admin", adminRoutes);
-// app.use(shopRoutes);
+app.use(shopRoutes);
 
 app.use(errorController.get404);
 
