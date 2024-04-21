@@ -1,4 +1,7 @@
 const Product = require("../models/product.model");
+const mongodb = require("mongodb");
+
+const ObjectId = mongodb.ObjectId;
 
 /**
  * Renders the add-product page with specified properties.
@@ -63,47 +66,45 @@ exports.getProducts = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
-// exports.getEditProduct = async (req, res, next) => {
-//   const editMode = req.query.edit;
-//   if (!editMode) {
-//     return res.redirect("/");
-//   }
-//   const { productId } = req.params;
-//   try {
-//     const products = await req.user.getProducts({ where: { id: productId } });
-//     const product = products[0];
-//     if (!product) {
-//       return res.redirect("/");
-//     }
-//     res.render("admin/edit-product", {
-//       pageTitle: "Edit Product",
-//       path: "/admin/edit-product",
-//       editing: editMode,
-//       product: product,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+exports.getEditProduct = async (req, res, next) => {
+  const editMode = req.query.edit;
+  if (!editMode) {
+    return res.redirect("/");
+  }
+  const { productId } = req.params;
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.redirect("/");
+    }
+    res.render("admin/edit-product", {
+      pageTitle: "Edit Product",
+      path: "/admin/edit-product",
+      editing: editMode,
+      product: product,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-// exports.postEditProduct = async (req, res, next) => {
-//   const { id, title, imageUrl, description, price } = req.body;
+exports.postEditProduct = async (req, res, next) => {
+  const { id, title, imageUrl, description, price } = req.body;
 
-//   try {
-//     await Product.update(
-//       {
-//         title: title,
-//         imageUrl: imageUrl,
-//         description: description,
-//         price: price,
-//       },
-//       { where: { id: id } }
-//     );
-//     res.redirect("/admin/products");
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+  try {
+    const product = new Product(
+      title,
+      price,
+      description,
+      imageUrl,
+      new ObjectId(id)
+    );
+    await product.save();
+    res.redirect("/admin/products");
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 // exports.postDeleteProduct = async (req, res, next) => {
 //   const { productId } = req.body;
