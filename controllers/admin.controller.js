@@ -25,49 +25,36 @@ exports.getAddProduct = (req, res, next) => {
  * @param {Object} res Response object
  * @param {Function} next Next middleware function
  */
-exports.postAddProduct = (req, res, next) => {
+exports.postAddProduct = async (req, res, next) => {
   const { title, imageUrl, description, price } = req.body;
-  const product = new Product(
+  const product = new Product({
     title,
     price,
     description,
     imageUrl,
-    null,
-    req.user._id
-  );
-  product
-    .save()
-    .then(() => {
-      res.redirect("/admin/products");
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  // req.user
-  //   .createProduct({
-  //     title: title,
-  //     price: price,
-  //     description: description,
-  //     imageUrl: imageUrl,
-  //   })
-  //   .then((result) => {
-  //     res.redirect("/admin/products");
-  //   })
-  //   .catch((err) => {
-  //     console.log(err);
-  //   });
+    userId: req.user,
+  });
+  try {
+    await product.save();
+    res.redirect("/admin/products");
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
-    .then((products) => {
-      res.render("admin/products", {
-        prods: products,
-        pageTitle: "Admin Products",
-        path: "/admin/products",
-      });
-    })
-    .catch((err) => console.log(err));
+exports.getProducts = async (req, res, next) => {
+  try {
+    const products = await Product.find();
+    //.select("title price -_id")
+    // .populate("userId", "name");
+    res.render("admin/products", {
+      prods: products,
+      pageTitle: "Admin Products",
+      path: "/admin/products",
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 exports.getEditProduct = async (req, res, next) => {
@@ -96,8 +83,12 @@ exports.postEditProduct = async (req, res, next) => {
   const { id, title, imageUrl, description, price } = req.body;
 
   try {
-    const product = new Product(title, price, description, imageUrl, id);
-    await product.save();
+    await Product.findByIdAndUpdate(id, {
+      title,
+      price,
+      description,
+      imageUrl,
+    });
     res.redirect("/admin/products");
   } catch (error) {
     console.log(error);
@@ -107,7 +98,7 @@ exports.postEditProduct = async (req, res, next) => {
 exports.postDeleteProduct = async (req, res, next) => {
   const { productId } = req.body;
   try {
-    await Product.deleteById(productId);
+    await Product.findByIdAndDelete(productId);
     res.redirect("/admin/products");
   } catch (error) {
     console.log(error);
