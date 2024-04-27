@@ -1,7 +1,4 @@
 const Product = require("../models/product.model");
-const mongodb = require("mongodb");
-
-const ObjectId = mongodb.ObjectId;
 
 /**
  * Renders the add-product page with specified properties.
@@ -30,7 +27,14 @@ exports.getAddProduct = (req, res, next) => {
  */
 exports.postAddProduct = (req, res, next) => {
   const { title, imageUrl, description, price } = req.body;
-  const product = new Product(title, price, description, imageUrl);
+  const product = new Product(
+    title,
+    price,
+    description,
+    imageUrl,
+    null,
+    req.user._id
+  );
   product
     .save()
     .then(() => {
@@ -92,13 +96,7 @@ exports.postEditProduct = async (req, res, next) => {
   const { id, title, imageUrl, description, price } = req.body;
 
   try {
-    const product = new Product(
-      title,
-      price,
-      description,
-      imageUrl,
-      new ObjectId(id)
-    );
+    const product = new Product(title, price, description, imageUrl, id);
     await product.save();
     res.redirect("/admin/products");
   } catch (error) {
@@ -106,16 +104,12 @@ exports.postEditProduct = async (req, res, next) => {
   }
 };
 
-// exports.postDeleteProduct = async (req, res, next) => {
-//   const { productId } = req.body;
-//   try {
-//     await Product.destroy({
-//       where: {
-//         id: productId,
-//       },
-//     });
-//     res.redirect("/admin/products");
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+exports.postDeleteProduct = async (req, res, next) => {
+  const { productId } = req.body;
+  try {
+    await Product.deleteById(productId);
+    res.redirect("/admin/products");
+  } catch (error) {
+    console.log(error);
+  }
+};

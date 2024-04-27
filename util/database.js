@@ -12,8 +12,7 @@ const mongodb = require("mongodb");
 
 const MongoClient = mongodb.MongoClient;
 
-const uri =
-  "mongodb+srv://Dani:D130319900k!@cluster0.rtvebxo.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0";
+const uri = "mongodb+srv://Dani:D130319900k!@cluster0.rtvebxo.mongodb.net/shop";
 let _db;
 const mongoConnection = (callback) => {
   MongoClient.connect(uri)

@@ -36,9 +36,6 @@ exports.getIndex = (req, res, next) => {
 exports.getCart = (req, res, next) => {
   req.user
     .getCart()
-    .then((cart) => {
-      return cart.getProducts();
-    })
     .then((products) => {
       res.render("shop/cart", {
         products: products,
@@ -51,39 +48,12 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
   const { productId } = req.body;
-  let fetchedCart;
-  let newQuantity = 1;
-  req.user
-    .getCart()
-    .then((cart) => {
-      fetchedCart = cart;
-      return cart
-        .getProducts({
-          where: {
-            id: productId,
-          },
-        })
-        .then((products) => {
-          let product;
-          if (products.length > 0) {
-            product = products[0];
-          }
-
-          if (product) {
-            const oldQty = product.cartItem.quantity;
-            newQuantity = oldQty + 1;
-            return product;
-          }
-          return Product.findByPk(productId);
-        })
-        .then((product) => {
-          return fetchedCart.addProduct(product, {
-            through: { quantity: newQuantity },
-          });
-        })
-        .then(() => {
-          res.redirect("/cart");
-        });
+  Product.findById(productId)
+    .then((product) => {
+      return req.user.addToCart(product);
+    })
+    .then(() => {
+      res.redirect("/cart");
     })
     .catch((err) => console.log(err));
 };
@@ -91,14 +61,7 @@ exports.postCart = (req, res, next) => {
 exports.postCartDeleteProduct = (req, res, next) => {
   const { productId } = req.body;
   req.user
-    .getCart()
-    .then((cart) => {
-      return cart.getProducts({ where: { id: productId } });
-    })
-    .then((products) => {
-      const product = products[0];
-      product.cartItem.destroy();
-    })
+    .deleteItemFromCart(productId)
     .then((result) => {
       res.redirect("/cart");
     })
@@ -108,24 +71,7 @@ exports.postCartDeleteProduct = (req, res, next) => {
 exports.postOrder = (req, res, next) => {
   let fetchedCart;
   req.user
-    .getCart()
-    .then((cart) => {
-      fetchedCart = cart;
-      return cart.getProducts();
-    })
-    .then((products) => {
-      return req.user.createOrder().then((order) => {
-        return order.addProducts(
-          products.map((p) => {
-            p.orderItem = { quantity: p.cartItem.quantity };
-            return p;
-          })
-        );
-      });
-    })
-    .then((resp) => {
-      fetchedCart.setProducts(null);
-    })
+    .addOrder()
     .then(() => {
       res.redirect("shop/orders");
     })
@@ -134,7 +80,7 @@ exports.postOrder = (req, res, next) => {
 
 exports.getOrders = (req, res, next) => {
   req.user
-    .getOrders({ include: ["products"] })
+    .getOrders()
     .then((orders) => {
       res.render("shop/orders", {
         orders: orders,
