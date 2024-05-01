@@ -62,16 +62,6 @@ mongoose
   .connect(DB_URL)
   .then(async (result) => {
     console.log("DB connected");
-    let user = await User.findOne();
-    if (!user) {
-      user = new User({
-        name: "Dani",
-        email: "dani@gmail.com",
-        cart: { items: [] },
-      });
-      user.save();
-    }
-
     app.listen(3000);
   })
   .catch((err) => console.log(err));

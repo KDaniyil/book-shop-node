@@ -43,6 +43,11 @@
         <a class="<%= path === '/login' ? 'active' : '' %>" href="/login"
           >Login</a
         >
+        <li class="main-header__item">
+          <a class="<%= path === '/signup' ? 'active' : '' %>" href="/signup"
+            >Signup</a
+          >
+        </li>
       </li>
       <% } else { %>
       <li class="main-header__item">
@@ -50,11 +55,7 @@
           <button type="submit">Logout</button>
         </form>
       </li>
-      <li class="main-header__item">
-        <a class="<%= path === '/signup' ? 'active' : '' %>" href="/signup"
-          >Signup</a
-        >
-      </li>
+
       <% } %>
     </ul>
   </nav>
