@@ -7,6 +7,9 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 const DB_URL =
   "mongodb+srv://Dani:D130319900k!@cluster0.rtvebxo.mongodb.net/shop";
 
+const csrf = require("csurf");
+const flash = require("connect-flash");
+
 const errorController = require("./controllers/error.controller");
 
 const app = express();
@@ -15,6 +18,8 @@ const store = new MongoDBStore({
   uri: DB_URL,
   collection: "sessions",
 });
+
+const csrfProtection = csrf();
 
 //models
 const User = require("./models/user.model");
@@ -39,6 +44,9 @@ app.use(
   })
 );
 
+app.use(csrfProtection);
+app.use(flash());
+
 app.use(async (req, res, next) => {
   try {
     if (!req.session.user) {
@@ -51,7 +59,11 @@ app.use(async (req, res, next) => {
     console.log(err);
   }
 });
-
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
 // use Routes
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);

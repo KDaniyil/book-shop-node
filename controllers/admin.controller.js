@@ -1,5 +1,4 @@
 const Product = require("../models/product.model");
-
 /**
  * Renders the add-product page with specified properties.
  *
@@ -9,14 +8,10 @@ const Product = require("../models/product.model");
  * @return {void}
  */
 exports.getAddProduct = (req, res, next) => {
-  if (!req.session.isLoggedIn) {
-    return res.redirect("/login");
-  }
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
     path: "/admin/add-product",
     editing: false,
-    isAuthenticated: req.session.isLoggedIn,
   });
 };
 
@@ -55,7 +50,6 @@ exports.getProducts = async (req, res, next) => {
       prods: products,
       pageTitle: "Admin Products",
       path: "/admin/products",
-      isAuthenticated: req.session.isLoggedIn,
     });
   } catch (error) {
     console.log(error);
@@ -78,7 +72,6 @@ exports.getEditProduct = async (req, res, next) => {
       path: "/admin/edit-product",
       editing: editMode,
       product: product,
-      isAuthenticated: req.session.isLoggedIn,
     });
   } catch (error) {
     console.log(error);

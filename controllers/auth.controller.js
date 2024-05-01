@@ -2,10 +2,16 @@ const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 
 exports.getLogin = (req, res, next) => {
+  let errorMessage = req.flash("error");
+  if (errorMessage.length > 0) {
+    errorMessage = errorMessage[0];
+  } else {
+    errorMessage = null;
+  }
   res.render("auth/login", {
     path: "/login",
     pageTitle: "Login",
-    isAuthenticated: req.session.isLoggedIn,
+    errorMessage: errorMessage,
   });
 };
 
@@ -15,6 +21,7 @@ exports.postLogin = async (req, res, next) => {
     const password = req.body.password;
     const user = await User.findOne({ email: email });
     if (!user) {
+      req.flash("error", "Invalid email or password");
       return res.redirect("/login");
     }
     const doMatch = await bcrypt.compare(password, user.password);
@@ -25,6 +32,7 @@ exports.postLogin = async (req, res, next) => {
         res.redirect("/");
       });
     }
+    req.flash("error", "Invalid email or password");
     res.redirect("/login");
   } catch (error) {
     console.log(error);
@@ -44,6 +52,7 @@ exports.postSignup = async (req, res, next) => {
     const userDoc = await User.findOne({ email: email });
 
     if (userDoc) {
+      req.flash("error", "User already exists");
       return res.redirect("/signup");
     } else {
       const hashedPassword = await bcrypt.hash(password, 12);
@@ -60,9 +69,15 @@ exports.postSignup = async (req, res, next) => {
   }
 };
 exports.getSignup = (req, res, next) => {
+  let errorMessage = req.flash("error");
+  if (errorMessage.length > 0) {
+    errorMessage = errorMessage[0];
+  } else {
+    errorMessage = null;
+  }
   res.render("auth/signup", {
     path: "/signup",
     pageTitle: "Signup",
-    isAuthenticated: req.session.isLoggedIn,
+    errorMessage: errorMessage,
   });
 };
