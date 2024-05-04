@@ -1,6 +1,17 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 
+const nodemailer = require("nodemailer");
+const sendgridTransport = require("nodemailer-sendgrid-transport");
+
+const transporter = nodemailer.createTransport(
+  sendgridTransport({
+    auth: {
+      api_key: "sasdasasd",
+    },
+  })
+);
+
 exports.getLogin = (req, res, next) => {
   let errorMessage = req.flash("error");
   if (errorMessage.length > 0) {
@@ -63,6 +74,12 @@ exports.postSignup = async (req, res, next) => {
       });
       await user.save();
       res.redirect("/login");
+      await transporter.sendMail({
+        to: email,
+        from: "daniyil.kud@gmail.com",
+        subject: "Signup Successful",
+        html: "<h1>You have signed up successfully</h1>",
+      });
     }
   } catch (error) {
     console.log(error);
@@ -79,5 +96,12 @@ exports.getSignup = (req, res, next) => {
     path: "/signup",
     pageTitle: "Signup",
     errorMessage: errorMessage,
+  });
+};
+
+exports.getReset = (req, res, next) => {
+  res.render("auth/reset", {
+    path: "/reset",
+    pageTitle: "Reset Password",
   });
 };
